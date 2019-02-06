@@ -14,25 +14,26 @@ class App extends React.Component {
 
   componentDidMount() {
     this.renderBall();
-    this.getCookie();
+    this.getCookie();   
+    this.generateRandomId();
   }
 
   setCookie() {
     const { userCookie } = this.state;
    
-    document.cookie = `${userCookie.hashId}=hashId; expires= Thu, 21 Aug 2019 20:00:00 UTC`;
-    document.cookie = `${userCookie.ballColor}=ballColor; expires= Thu, 21 Aug 2019 20:00:00 UTC`;
-    document.cookie = `${userCookie.visits}=visits; expires= Thu, 21 Aug 2019 20:00:00 UTC`;
+    document.cookie = `hashId=${userCookie.hashId}; expires= Thu, 21 Aug 2019 20:00:00 UTC`;
+    document.cookie = `ballColor=${userCookie.ballColor}; expires= Thu, 21 Aug 2019 20:00:00 UTC`;
+    document.cookie = `visits=${userCookie.visits}; expires= Thu, 21 Aug 2019 20:00:00 UTC`;
   }
 
   renderBall() {
     const randNum = max => Math.floor(Math.random() * max);
     const colorClasses = ['blue-ball', 'red-ball'];
-    
+    const newId = this.generateRandomId();
 
-    if (!this.state.userCookie.hashId) {
+    if (!this.state.userCookie.visits) {
       this.setState({ 
-        userCookie: { hashId: 'ndvbwvu348hsdc', ballColor: colorClasses[randNum(colorClasses.length)], visits: 1 }
+        userCookie: { hashId: newId, ballColor: colorClasses[randNum(colorClasses.length)], visits: 1 }
       }, () => this.setCookie());
     }
   }
@@ -53,13 +54,62 @@ class App extends React.Component {
   }
 
   getCookie() {
+
     if (document.cookie) {
-      console.log(this.parseCookies(document.cookie));
+      const cookie = this.parseCookies(document.cookie);
+      let hashId;
+      let ballColor;
+      let visits;
+      
+      for (let key in cookie) {
+        if (key === 'visits') {
+          visits = Number(cookie[key]) + 1;
+        }
+        if (key === 'hashId') {
+          hashId = cookie[key];
+        }
+        if (key === 'ballColor') {
+          ballColor = cookie[key];
+        }
+      }
+      this.setState({ 
+        userCookie: { hashId: hashId, ballColor: ballColor, visits: visits }
+      }, () => this.setCookie());
     }
-    // this.setState({
-    //   userCookie: this.browser.cookies.getAll({hashId: this.state.userId})
-    // })
+
   }
+
+  generateRandomId() {
+    const randNum = max => Math.floor(Math.random() * max);
+
+    const letters = 'abcdefghijklmnopqrstuvwxyz';
+    const upperLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const nums = '1234567890';
+    const specials = '!@#$%&*';
+
+    const allVals = [letters, upperLetters, nums, specials];
+
+    let id = '';
+
+    for (let val of allVals) {
+      id += val.substring(randNum(val.length), randNum(val.length) + 1)
+    }
+    return id;
+  }
+
+
+  render() {
+    const { userCookie } = this.state;
+    
+    return (
+      <div className="container">
+        <div className={`${userCookie.ballColor} ball`}></div>
+      </div>
+    )
+  }
+}
+
+export default App;
 
   /*
 
@@ -92,16 +142,3 @@ class App extends React.Component {
   }
 
   */
-
-  render() {
-    const { userCookie } = this.state;
-    
-    return (
-      <div className="container">
-        <div className={`${userCookie.ballColor} ball`}></div>
-      </div>
-    )
-  }
-}
-
-export default App;
