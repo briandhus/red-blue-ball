@@ -4,21 +4,25 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // visited: false,
-      // ballColor: null,
       userCookie: {
+        hashId: null,
         ballColor: null,
         visits: null,
-        hashId: null,
       }
     };
   }
 
   componentDidMount() {
-    this.alertCookie();
     this.renderBall();
-    // docCookies.getItem(name)
-    // this.getHashId;
+    this.getCookie();
+  }
+
+  setCookie() {
+    const { userCookie } = this.state;
+   
+    document.cookie = `${userCookie.hashId}=hashId; expires= Thu, 21 Aug 2019 20:00:00 UTC`;
+    document.cookie = `${userCookie.ballColor}=ballColor; expires= Thu, 21 Aug 2019 20:00:00 UTC`;
+    document.cookie = `${userCookie.visits}=visits; expires= Thu, 21 Aug 2019 20:00:00 UTC`;
   }
 
   renderBall() {
@@ -27,31 +31,71 @@ class App extends React.Component {
     
 
     if (!this.state.userCookie.hashId) {
-      this.setState({ userCookie: { ballColor: colorClasses[randNum(colorClasses.length)] }});
+      this.setState({ 
+        userCookie: { hashId: 'ndvbwvu348hsdc', ballColor: colorClasses[randNum(colorClasses.length)], visits: 1 }
+      }, () => this.setCookie());
     }
   }
 
+  parseCookies(cookies) {
+    const splitCookies = cookies.split('; ');
+    let values = [];
+    for (let item of splitCookies) {
+      values.push(item.split('='));
+    }
+
+    let parsedItem = {};
+    parsedItem[values[0][0]] = values[0][1];
+    parsedItem[values[1][0]] = values[1][1];
+    parsedItem[values[2][0]] = values[2][1];
+     
+    return parsedItem;
+  }
+
+  getCookie() {
+    if (document.cookie) {
+      console.log(this.parseCookies(document.cookie));
+    }
+    // this.setState({
+    //   userCookie: this.browser.cookies.getAll({hashId: this.state.userId})
+    // })
+  }
+
+  /*
+
   getHashId() {
-    fetch(`/id`)
-      .then(response => response.json())
-      .then((cookie) => {
-        this.setState({ userCookie: cookie });
+
+    // const { userCookie } = this.state;
+
+    // const visits = document.cookie.replace(/(?:(?:^|.*;\s*)visits\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+
+    // if (visits > 0) {
+    //   document.cookie('visits', `${visits++}`);
+    //   // this.setState({ userCookie[visits]: })
+    // };
+    
+    fetch('/id')
+      .then((response) => {
+        this.setState({ userCookie: this.parseCookies(document.cookie) });
       })
       .catch(error => console.log(error));
   }
 
-  getCookie() {
-    this.setState({
-      userCookie: this.browser.cookies.getAll({hashId: this.state.userId})
-    })
-  }
 
   alertCookie() {
-    alert(document.cookie);
+    const color = document.cookie.replace(/(?:(?:^|.*;\s*)ball_color\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    const id = document.cookie.replace(/(?:(?:^|.*;\s*)hash_id\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    const visits = document.cookie.replace(/(?:(?:^|.*;\s*)visits\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    if (visits > 0) {
+      alert(`${color} ${id} ${visits}`)
+    };
   }
+
+  */
 
   render() {
     const { userCookie } = this.state;
+    
     return (
       <div className="container">
         <div className={`${userCookie.ballColor} ball`}></div>
