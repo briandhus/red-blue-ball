@@ -92,7 +92,7 @@ class App extends React.Component {
     let id = '';
 
     for (let val of allVals) {
-      id += val.substring(randNum(val.length), randNum(val.length) + 1)
+      id += val.substring(randNum(val.length), randNum(val.length) + 1);
     }
     return id;
   }

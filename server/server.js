@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+// const db = require('./db/connection.js');
 const utils = require('./lib/hashUtils');
 
 const app = express();
